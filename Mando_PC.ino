@@ -51,6 +51,7 @@ int teclado;
 *************************************************************************
 */
 #define IRprotocolo  NEC            //Protocolo a usar
+#define nombremando  0x6170         //Los primeros 16 bits de una tecla se repiten, es el "nombre del mando" 
 #define IRarriba     0xD02F         //Devuelve el valor 1
 #define IRabajo      0x30CF         //Devuelve el valor 2 
 #define IRizquierda  0xD827         //Devuelve el valor 3
@@ -158,12 +159,16 @@ SI NO HAY NADA PULSADO DEVUELVE 0
 
   //Enpezamos la recepcion de codigos  
   if (infra.decode(&results)) {
-  int lectura = results.value;
+  
+  long codigo = results.value; 
+  int lectura = results.value;   //Tenia que pasarse a un long pero asi cojo solo el entero (16 bits)inferior, el entero superior se repite
   int tipo  = results.decode_type;
 
+  int mando = (codigo >> 16);  //Cojo los 16 bits superiores, que es donde esta el "nombre" del mando
+  
   borrapantalla = 0;
   
-  if (tipo == IRprotocolo){
+  if ((tipo == IRprotocolo) & (mando == nombremando)){
 
   //Comprobamos si es repeticion
   if(lectura == Repeticion){  
